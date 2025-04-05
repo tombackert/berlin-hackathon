@@ -26,6 +26,7 @@ class VoiceInterface:
         initModel()
 
     def text_to_speech(self, text_data):
+        """Turns text into speech using ElevenLabs API."""
         try:
             audio = self.el_client.text_to_speech.convert(
                 text=text_data,
@@ -38,6 +39,7 @@ class VoiceInterface:
             print(f"Text-to-Speech error: {e}")
 
     def speech_to_text(self, audio_data):
+        """Converts speech to text using ElevenLabs API."""
         try:
             transcription = self.el_client.speech_to_text.convert(
                 file=audio_data,
@@ -51,17 +53,20 @@ class VoiceInterface:
             return None
 
     def audio_callback(self, indata, frames, time, status):
+        """Callback function for audio stream."""
         if status:
             print(status, file=sys.stderr)
         self.audio_frames.append(indata.copy())
 
     def toggle_recording(self):
+        """Toggles the recording state."""
         if not self.is_recording:
             self.start_recording()
         else:
             self.stop_recording()
 
     def start_recording(self):
+        """Starts recording audio."""
         self.is_recording = True
         self.audio_frames = []
         self.stream = sd.InputStream(
@@ -73,6 +78,7 @@ class VoiceInterface:
         print("\n🎙️ Recording started...")
 
     def stop_recording(self):
+        """Stops recording audio and returns the audio data."""
         self.is_recording = False
         self.stream.stop()
         self.stream.close()
@@ -85,6 +91,7 @@ class VoiceInterface:
         return buffer
 
     def process_interaction(self):
+        """Processes the audio input and interacts with the Mistral model."""
         audio_buffer = self.stop_recording()
         user_text = self.speech_to_text(audio_buffer)
         
@@ -103,6 +110,7 @@ class VoiceInterface:
             self.text_to_speech(ai_response)
 
     def get_user_input(self):
+        """Helper function to get user input."""
         fd = sys.stdin.fileno()
         old_settings = termios.tcgetattr(fd)
         try:
