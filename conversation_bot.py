@@ -1,4 +1,3 @@
-# conversation_bot.py
 import os
 import sys
 import tty
@@ -10,7 +9,7 @@ import sounddevice as sd
 import soundfile as sf
 from elevenlabs.client import ElevenLabs
 from elevenlabs import play
-from mistral import initModel, sendMessage  # Unchanged functions
+from mistral import initModel, sendMessage
 
 load_dotenv()
 
@@ -92,7 +91,7 @@ class VoiceInterface:
         if user_text:
             print(f"Recognized: {user_text}")
             
-            global context  # Take from mistral.py
+            global context
             self.context = sendMessage(
                 context=self.context,
                 user_message=user_text,
@@ -131,7 +130,6 @@ class VoiceInterface:
                 break
 
 if __name__ == "__main__":
-    # Check environment variables
     required_keys = ['ELEVENLABS_API_KEY', 'MISTRAL_API_KEY']
     for key in required_keys:
         if not os.getenv(key):
