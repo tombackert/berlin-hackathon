@@ -38,9 +38,9 @@ standard_prompt = "You are a helpful assistant."
 
 if __name__ == "__main__":
     while True:
-        user_input = input("> ")
+        user_input = input("> ") ### input part
         if user_input == "exit":
             break
 
         context = sendMessage(context, user_input, standard_prompt)
-        print(f"\n\nAgent: {context[-1]['content']}\n")
+        print(f"\n\nAgent: {context[-1]['content']}\n") ### Redepart
