@@ -128,7 +128,7 @@ class VoiceInterface:
                     self.start_recording()
                 else:
                     print("\nProcessing...")
-                    self.process_interaction()
+                    self.process_interaction() ### Modify this to change conversation flow
                     print("\nReady for new input")
                     print("Press 's' to start/stop, 'q' to quit")
             elif key == 'q':
