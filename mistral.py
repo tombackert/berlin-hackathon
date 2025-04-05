@@ -1,5 +1,6 @@
 import os
 from mistralai import Mistral
+import openai
 from dotenv import load_dotenv
 
 api_key = None
@@ -7,24 +8,19 @@ model = None
 client = None
 
 def initModel():
-    global api_key
     global model
-    global client
     load_dotenv()
 
-    api_key = os.getenv("MISTRAL_API_KEY")
-    model = "mistral-large-latest"
+    openai.api_key = os.getenv("OPENAI_API_KEY")
+    model = "gpt-4"
 
-    client = Mistral(api_key=api_key)
-
-
-def sendMessage(context : list, user_message : str, system_prompt : str):
+def sendMessage(context: list, user_message: str, system_prompt: str):
     context.append({"role": "user", "content": user_message})
-    chat_response = client.chat.complete(
-        model= model,
-        messages = context + [{"role": "system", "content": system_prompt}]
+    chat_response = openai.ChatCompletion.create(
+        model=model,
+        messages=[{"role": "system", "content": system_prompt}] + context
     )
-    agent_answer = chat_response.choices[0].message.content
+    agent_answer = chat_response["choices"][0]["message"]["content"]
     context.append({"role": "assistant", "content": agent_answer})
     return context
 
