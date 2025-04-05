@@ -35,24 +35,11 @@ Powered by Mistral's advanced language models and ElevenLabs' lifelike voice syn
 - **Instant Feedback**  
   Error correction through supportive voice interactions
 
-### Concept Architecture
-```mermaid
-graph LR
-    Child -->|Voice Input| STT[Speech-to-Text]
-    STT -->|Text| Mistral
-    Mistral -->|Pedagogical Response| TTS[Text-to-Speech]
-    TTS -->|Voice Output| Child
-    Mistral --> Curriculum[Curriculum Engine]
-    Curriculum --> Concepts{Coding Concepts};
-```
-
 ### Technical Architecture
 ```mermaid
 graph LR
     Child -->|Voice Input| STT[Speech-to-Text]
-    STT -->|Text| Mistral
-    Mistral -->|Pedagogical Response| TTS[Text-to-Speech]
+    STT -->|Text| LLM
+    LLM -->|Pedagogical Response| TTS[Text-to-Speech]
     TTS -->|Voice Output| Child
-    Mistral --> Curriculum[Curriculum Engine]
-    Curriculum --> Concepts{Coding Concepts}
-
+    
