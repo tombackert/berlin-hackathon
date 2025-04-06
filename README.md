@@ -42,4 +42,50 @@ graph LR
     STT -->|Text| LLM
     LLM -->|Pedagogical Response| TTS[Text-to-Speech]
     TTS -->|Voice Output| Child
-    
+```
+
+---
+
+## ⚙️ APIs, Frameworks and Tools
+- Python 3.11
+- OpenAI API for LLM
+- ElevenLabs API for TextToSpeech and SpeechToText
+- Streamlit for GUI
+- Sounddevice Library
+- Soundfile Library
+
+### Installations
+
+#### Install openai lib
+```zsh
+python3.11 -m pip install openai==0.28.1
+```
+
+#### Install elevenlabs lib
+```zsh
+python3.11 -m pip install elevenlabs
+```
+
+#### Install streamlit lib
+```zsh
+python3.11 -m pip install streamlit
+```
+
+#### Install sounddevice lib
+```zsh
+python3.11 -m pip install sounddevice
+```
+
+#### Install soundfile lib
+```zsh
+python3.11 -m pip install soundfile
+```
+
+---
+
+## 🏃🏼 How to Run
+
+Change to the project directory and run the following command:
+```zsh
+streamlit run kidCoderAI.py
+```

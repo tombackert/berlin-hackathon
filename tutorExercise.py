@@ -1,20 +1,32 @@
 import mistral
+from conversation_bot import VoiceInterface
 
 exercise = None
 conversation_context = []
 NUMBEROFTESTS = 5
+voice_interface = VoiceInterface()
 
 str1 = """def solution(x):
     return x+1"""
 
 def generateExercise():
-    prompt = f"""Generate an easy programming exercise for absolute beginners who are currently in elementary school.
-    The exercise is supposed to be language independent. The child doesn't know the concepts of programming languages, therefore
-    this exercise is made to be about the concepts of programming itself.
-    ALWAYS MAKE SURE to generate a possible solution function (which is called "solution()") written in *python3*, as well as EXACTLY {NUMBEROFTESTS} test cases for the exercise.
-    The solution and test cases are supposed to work together to evalute the answer. Therefore the Test case should be the EXACT
-    input for th exercise and the solution should be the EXACT output that is supposed to be computed.
+    prompt = f"""
+    You are a nice, helpful tutor who currently teaches an elementary school child the basics concepts of programming.
+
+    Generate an easy programming exercise for absolute beginners who are currently in elementary school.
+    Be creative and make it fun. The exercise should be about a simple task that can be solved with a few lines of code.
+    The exercise should be easy to understand and should not require any prior knowledge of programming.
+    The exercise should be something that a child can relate to, like counting apples, animals or adding numbers.
+
+    The exercise is supposed to be language independent. The child doesn't know the concepts of programming languages yet, therefore this exercise is supposed to be about the concepts of programming itself.
+
+    ALWAYS MAKE SURE to generate a possible solution function (which is called "solution()") written in python3, as well as EXACTLY {NUMBEROFTESTS} test cases for the exercise.
+
+    The solution and test cases are supposed to work together to evalute the answer. Therefore the Test case should be the EXACT input for the exercise and the solution should be the EXACT output that is supposed to be computed.
+    MAKE SURE the test cases take the same input parameter as the solution function.
+
     The exercise should only include: Datatypes = (Integer), DataStructures=(Variables, List), Arithmetic=(+, -, *, /), Loops=(Single For Loop, While True)
+
     Answer EXACTLY in this format:
     'ExerciseDescription|PossibleSolution|Testcase&Solution|Testcase&Solution|...'
 
@@ -27,13 +39,14 @@ def extractExercise(exerciseString : str):
     global exercise
     data = exerciseString.split("|")
     exercise = {}
-    exercise["Description"] = data[0]
+    exercise["Description"] = data[0].replace("\'", "").replace("\"", "").replace("`", "")
     exercise["Solution"] = data[1]
     for i in range(2, 7):
         exercise[f"Test{i-2}"] = {}
         exercise[f"Test{i-2}"]["Case"] = data[i].split("&")[0]
         exercise[f"Test{i-2}"]["Solution"] = data[i].split("&")[1]
-    exercise["Current"] = "def userSolution():\n    pass"
+    exercise["Current"] = """def userSolution():
+        pass"""
     return exercise
 
 str2 = """def userSolution(x):
@@ -71,7 +84,10 @@ def discussion(user_input):
     response = mistral.sendMessage(conversation_context, user_input, system_prompt)[-1]["content"].split("|")
     conversation_context.append({"role": "user", "content": user_input})
     conversation_context.append({"role": "assistant", "content": response[0]})
+    
     print(response[0])
+    voice_interface.text_to_speech(response[0])
+    
     exercise["Current"] = response[1]
     return response[2] == "Yes"
 
@@ -135,16 +151,60 @@ def evaluateCode():
     "Unfortunately the code isn't correct. Don't worry, we will fix it together...|No"
     """
     response = mistral.sendMessage(conversation_context, "<Child waits for response>", system_prompt)[-1]["content"].split("|")
+    
     print(response[0])
+    voice_interface.text_to_speech(response[0])
+    
     return response[1] == "Yes"
+
+
+def process_user_interaction():
+    """Get user input via voice recording.
+    
+    Returns:
+        The transcribed text from the voice recording.
+    """
+    print("Press 's' to start recording, then 's' again to stop...")
+    
+    # Start recording when user presses 's'
+    while True:
+        key = voice_interface.get_user_input()
+        if key == 's':
+            voice_interface.start_recording()
+            print("Recording started... Press 's' to stop")
+            break
+        elif key == 'q':
+            return "quit"
+    
+    # Stop recording when user presses 's' again
+    while True:
+        key = voice_interface.get_user_input()
+        if key == 's':
+            audio_buffer = voice_interface.stop_recording()
+            print("\nProcessing...")
+            transcribed_text = voice_interface.speech_to_text(audio_buffer)
+            print(f"Transcribed: {transcribed_text}")
+            return transcribed_text
+        elif key == 'q':
+            audio_buffer = voice_interface.stop_recording()
+            return "quit"
+
 
 def exerciseRoutine():
     extractExercise(generateExercise())
     currentState = 0
+    voice_interface.text_to_speech("Let's start the exercise!")
+    voice_interface.text_to_speech(exercise["Description"])
     while True:
-        print(f"\nCurrent State: {currentState}")
-        print(f"Exercise: {exercise['Description']}\n\nCurrent Code:\n{exercise['Current']}")
-        user_message = input("> ")
+        print(f"Current State: {currentState}")
+        print()
+        print(f"Exercise: {exercise['Description']}")
+        print()
+        print("Current Code:")
+        print(f"{exercise['Current']}")
+        print()
+        
+        user_message = process_user_interaction()
         if currentState == 0:
             if discussion(user_message):
                 currentState = 1
@@ -156,6 +216,7 @@ def exerciseRoutine():
                     break
                 else:
                     currentState = 0
-    print("\n\n\n***EXERCISE FINISHED***")
+    print("\n***EXERCISE FINISHED***")
 
-exerciseRoutine()
+if __name__ == "main":
+    exerciseRoutine()

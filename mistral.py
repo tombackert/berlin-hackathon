@@ -28,11 +28,10 @@ def sendMessage(context: list, user_message: str, system_prompt: str):
 user_input = ""
 context = []
 
-initModel()
-
 standard_prompt = "You are a helpful assistant."
 
 if __name__ == "__main__":
+    initModel()
     while True:
         user_input = input("> ") ### input part
         if user_input == "exit":
