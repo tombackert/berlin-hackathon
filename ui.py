@@ -93,7 +93,6 @@ def discussion(user_input):
     st.session_state["conversation_context"].append({"role": "assistant", "content": response[0]})
     
     st.session_state["lastResponse"] = response[0]
-    st.session_state["voice_interface"].text_to_speech(response[0])
     
     st.session_state["exercise"]["Current"] = response[1]
 
@@ -156,7 +155,6 @@ def evaluateCode():
     response = mistral.sendMessage(st.session_state["conversation_context"], "<Child waits for response>", system_prompt)[-1]["content"].split("|")
     
     st.session_state["lastResponse"] = response[0]
-    st.session_state["voice_interface"].text_to_speech(response[0])
     
     return passed
 
@@ -229,6 +227,7 @@ if st.session_state["discuss"]:
             
             if transcribed_text and transcribed_text != "quit":
                 discussion(transcribed_text)
+                st.session_state["voice_interface"].text_to_speech(st.session_state["lastResponse"])
                 st.rerun()
 
 
@@ -242,7 +241,9 @@ if st.button("Eval"):
 if st.session_state["eval_clicked"]:
     print("In Eval routine")
     st.session_state["eval_clicked"] = False
-    if evaluateCode():
+    b = evaluateCode()
+    st.session_state["voice_interface"].text_to_speech(st.session_state["lastResponse"])
+    if b:
         st.success("SUPER")
     else:
         st.session_state["discuss"] = True
@@ -259,3 +260,4 @@ if st.session_state["reset"]:
     st.session_state["reset"] = False
     for key in list(st.session_state.keys()):
         del st.session_state[key]
+    st.rerun()
