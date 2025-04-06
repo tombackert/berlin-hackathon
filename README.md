@@ -68,3 +68,13 @@ python3.11 -m pip install elevenlabs
 ```zsh
 python3.11 -m pip install streamlit
 ```
+
+#### Install sounddevice lib
+```zsh
+python3.11 -m pip install sounddevice
+```
+
+#### Install soundfile lib
+```zsh
+python3.11 -m pip install soundfile
+```

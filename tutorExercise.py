@@ -1,7 +1,5 @@
 import mistral
 from conversation_bot import VoiceInterface
-import streamlit as st
-import ui
 
 exercise = None
 conversation_context = []
@@ -12,20 +10,29 @@ str1 = """def solution(x):
     return x+1"""
 
 def generateExercise():
-    prompt = f"""Generate an easy programming exercise for absolute beginners who are currently in elementary school.
-    The exercise is supposed to be language independent. The child doesn't know the concepts of programming languages, therefore
-    this exercise is made to be about the concepts of programming itself.
-    ALWAYS MAKE SURE to generate a possible solution function (which is called "solution()") written in *python3*, as well as EXACTLY {NUMBEROFTESTS} test cases for the exercise.
-    The solution and test cases are supposed to work together to evalute the answer. Therefore the Test case should be the EXACT
-    input for th exercise and the solution should be the EXACT output that is supposed to be computed.
+    prompt = f"""
+    You are a nice, helpful tutor who currently teaches an elementary school child the basics concepts of programming.
+
+    Generate an easy programming exercise for absolute beginners who are currently in elementary school.
+    Be creative and make it fun. The exercise should be about a simple task that can be solved with a few lines of code.
+    The exercise should be easy to understand and should not require any prior knowledge of programming.
+    The exercise should be something that a child can relate to, like counting apples, animals or adding numbers.
+
+    The exercise is supposed to be language independent. The child doesn't know the concepts of programming languages yet, therefore this exercise is supposed to be about the concepts of programming itself.
+
+    ALWAYS MAKE SURE to generate a possible solution function (which is called "solution()") written in python3, as well as EXACTLY {NUMBEROFTESTS} test cases for the exercise.
+
+    The solution and test cases are supposed to work together to evalute the answer. Therefore the Test case should be the EXACT input for the exercise and the solution should be the EXACT output that is supposed to be computed.
+    MAKE SURE the test cases take the same input parameter as the solution function.
+
     The exercise should only include: Datatypes = (Integer), DataStructures=(Variables, List), Arithmetic=(+, -, *, /), Loops=(Single For Loop, While True)
+
     Answer EXACTLY in this format:
     'ExerciseDescription|PossibleSolution|Testcase&Solution|Testcase&Solution|...'
 
     Example:
     'Increment an integer.|{str1}|1&2|3&4|8&9|12&13|99&100'
     """
-    mistral.initModel()
     return mistral.sendMessage([], "", prompt)[-1]['content']
 
 def extractExercise(exerciseString : str):
@@ -40,7 +47,6 @@ def extractExercise(exerciseString : str):
         exercise[f"Test{i-2}"]["Solution"] = data[i].split("&")[1]
     exercise["Current"] = """def userSolution():
         pass"""
-    ui.displayUI(exercise["Description"], None, exercise["Current"])
     return exercise
 
 str2 = """def userSolution(x):
@@ -80,7 +86,6 @@ def discussion(user_input):
     conversation_context.append({"role": "assistant", "content": response[0]})
     
     print(response[0])
-    ui.displayUI(exercise["Description"], response[0], exercise["Current"])
     voice_interface.text_to_speech(response[0])
     
     exercise["Current"] = response[1]
@@ -148,7 +153,6 @@ def evaluateCode():
     response = mistral.sendMessage(conversation_context, "<Child waits for response>", system_prompt)[-1]["content"].split("|")
     
     print(response[0])
-    ui.displayUI(exercise["Description"], None, exercise["Current"])
     voice_interface.text_to_speech(response[0])
     
     return response[1] == "Yes"
