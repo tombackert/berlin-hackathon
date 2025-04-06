@@ -1,8 +1,10 @@
 import mistral
+from conversation_bot import VoiceInterface
 
 exercise = None
 conversation_context = []
 NUMBEROFTESTS = 5
+voice_interface = VoiceInterface()
 
 str1 = """def solution(x):
     return x+1"""
@@ -71,7 +73,10 @@ def discussion(user_input):
     response = mistral.sendMessage(conversation_context, user_input, system_prompt)[-1]["content"].split("|")
     conversation_context.append({"role": "user", "content": user_input})
     conversation_context.append({"role": "assistant", "content": response[0]})
+    
     print(response[0])
+    voice_interface.text_to_speech(response[0])
+    
     exercise["Current"] = response[1]
     return response[2] == "Yes"
 
@@ -135,16 +140,60 @@ def evaluateCode():
     "Unfortunately the code isn't correct. Don't worry, we will fix it together...|No"
     """
     response = mistral.sendMessage(conversation_context, "<Child waits for response>", system_prompt)[-1]["content"].split("|")
+    
     print(response[0])
+    voice_interface.text_to_speech(response[0])
+    
     return response[1] == "Yes"
+
+
+def process_user_interaction():
+    """Get user input via voice recording.
+    
+    Returns:
+        The transcribed text from the voice recording.
+    """
+    print("Press 's' to start recording, then 's' again to stop...")
+    
+    # Start recording when user presses 's'
+    while True:
+        key = voice_interface.get_user_input()
+        if key == 's':
+            voice_interface.start_recording()
+            print("Recording started... Press 's' to stop")
+            break
+        elif key == 'q':
+            return "quit"
+    
+    # Stop recording when user presses 's' again
+    while True:
+        key = voice_interface.get_user_input()
+        if key == 's':
+            audio_buffer = voice_interface.stop_recording()
+            print("\nProcessing...")
+            transcribed_text = voice_interface.speech_to_text(audio_buffer)
+            print(f"Transcribed: {transcribed_text}")
+            return transcribed_text
+        elif key == 'q':
+            audio_buffer = voice_interface.stop_recording()
+            return "quit"
+
 
 def exerciseRoutine():
     extractExercise(generateExercise())
     currentState = 0
+    voice_interface.text_to_speech("Let's start the exercise!")
+    voice_interface.text_to_speech(exercise["Description"])
     while True:
-        print(f"\nCurrent State: {currentState}")
-        print(f"Exercise: {exercise['Description']}\n\nCurrent Code:\n{exercise['Current']}")
-        user_message = input("> ")
+        print(f"Current State: {currentState}")
+        print()
+        print(f"Exercise: {exercise['Description']}")
+        print()
+        print("Current Code:")
+        print(f"{exercise['Current']}")
+        print()
+        
+        user_message = process_user_interaction()
         if currentState == 0:
             if discussion(user_message):
                 currentState = 1
@@ -156,7 +205,7 @@ def exerciseRoutine():
                     break
                 else:
                     currentState = 0
-    print("\n\n\n***EXERCISE FINISHED***")
+    print("\n***EXERCISE FINISHED***")
 
 if __name__ == "main":
     exerciseRoutine()
