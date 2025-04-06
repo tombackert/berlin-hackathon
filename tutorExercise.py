@@ -1,5 +1,7 @@
 import mistral
 from conversation_bot import VoiceInterface
+import streamlit as st
+import ui
 
 exercise = None
 conversation_context = []
@@ -23,6 +25,7 @@ def generateExercise():
     Example:
     'Increment an integer.|{str1}|1&2|3&4|8&9|12&13|99&100'
     """
+    mistral.initModel()
     return mistral.sendMessage([], "", prompt)[-1]['content']
 
 def extractExercise(exerciseString : str):
@@ -35,7 +38,9 @@ def extractExercise(exerciseString : str):
         exercise[f"Test{i-2}"] = {}
         exercise[f"Test{i-2}"]["Case"] = data[i].split("&")[0]
         exercise[f"Test{i-2}"]["Solution"] = data[i].split("&")[1]
-    exercise["Current"] = "def userSolution():\n    pass"
+    exercise["Current"] = """def userSolution():
+        pass"""
+    ui.displayUI(exercise["Description"], None, exercise["Current"])
     return exercise
 
 str2 = """def userSolution(x):
@@ -75,6 +80,7 @@ def discussion(user_input):
     conversation_context.append({"role": "assistant", "content": response[0]})
     
     print(response[0])
+    ui.displayUI(exercise["Description"], response[0], exercise["Current"])
     voice_interface.text_to_speech(response[0])
     
     exercise["Current"] = response[1]
@@ -142,6 +148,7 @@ def evaluateCode():
     response = mistral.sendMessage(conversation_context, "<Child waits for response>", system_prompt)[-1]["content"].split("|")
     
     print(response[0])
+    ui.displayUI(exercise["Description"], None, exercise["Current"])
     voice_interface.text_to_speech(response[0])
     
     return response[1] == "Yes"

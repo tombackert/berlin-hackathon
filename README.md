@@ -42,4 +42,29 @@ graph LR
     STT -->|Text| LLM
     LLM -->|Pedagogical Response| TTS[Text-to-Speech]
     TTS -->|Voice Output| Child
-    
+```
+
+---
+
+## ⚙️ APIs, Frameworks and Tools
+- Python 3.11
+- OpenAI API for LLM
+- ElevenLabs API for TextToSpeech and SpeechToText
+- Streamlit for GUI
+
+### Installations
+
+#### Install openai lib
+```zsh
+python3.11 -m pip install openai==0.28.1
+```
+
+#### Install elevenlabs lib
+```zsh
+python3.11 -m pip install elevenlabs
+```
+
+#### Install streamlit lib
+```zsh
+python3.11 -m pip install streamlit
+```
