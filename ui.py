@@ -10,6 +10,10 @@ if "exercise" not in st.session_state:
 if "conversation_context" not in st.session_state:
     st.session_state["conversation_context"] = []
 
+if "speak" not in st.session_state:
+    st.session_state["speak"] = False
+
+
 NUMBEROFTESTS = 5
 
 if "voice_interface" not in st.session_state:
@@ -197,6 +201,10 @@ displayQuestion(st.session_state["exercise"]["Description"])
 displayLastResponse(st.session_state["lastResponse"])
 displayCode(st.session_state["exercise"]["Current"])
 
+if st.session_state["speak"]:
+    st.session_state["voice_interface"].text_to_speech(st.session_state["lastResponse"])
+    st.session_state["speak"] = False
+
 if "onlyDoOnce" not in st.session_state:
     st.session_state["onlyDoOnce"] = True
     st.session_state["voice_interface"].text_to_speech("Let's start the exercise!")
@@ -227,7 +235,7 @@ if st.session_state["discuss"]:
             
             if transcribed_text and transcribed_text != "quit":
                 discussion(transcribed_text)
-                st.session_state["voice_interface"].text_to_speech(st.session_state["lastResponse"])
+                st.session_state["speak"] = True
                 st.rerun()
 
 
@@ -242,7 +250,7 @@ if st.session_state["eval_clicked"]:
     print("In Eval routine")
     st.session_state["eval_clicked"] = False
     b = evaluateCode()
-    st.session_state["voice_interface"].text_to_speech(st.session_state["lastResponse"])
+    st.session_state["speak"] = True
     if b:
         st.success("SUPER")
     else:
