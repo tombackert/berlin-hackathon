@@ -195,6 +195,9 @@ def process_user_interaction():
 if "currentState" not in st.session_state:
     st.session_state["currentState"] = 0
 
+displayQuestion(st.session_state["exercise"]["Description"])
+displayLastResponse(st.session_state["lastResponse"])
+displayCode(st.session_state["exercise"]["Current"])
 
 if "onlyDoOnce" not in st.session_state:
     st.session_state["onlyDoOnce"] = True
@@ -204,24 +207,30 @@ if "onlyDoOnce" not in st.session_state:
 if "discuss" not in st.session_state:
     st.session_state["discuss"] = True
 
-displayQuestion(st.session_state["exercise"]["Description"])
+
 if st.session_state["discuss"]:
-    user_message = input("> ")#process_user_interaction()
-    discussion(user_message)
-    st.session_state["discuss"] = False
-displayLastResponse(st.session_state["lastResponse"])
-displayCode(st.session_state["exercise"]["Current"])
 
-if "ask_clicked" not in st.session_state:
-    st.session_state["ask_clicked"] = False
+    if "recording" not in st.session_state:
+        st.session_state["recording"] = False
 
-if st.button("Ask"):
-    st.session_state["ask_clicked"] = True
+    col1, col2 = st.columns(2)
 
-if st.session_state["ask_clicked"]:
-    st.session_state["ask_clicked"] = False  # Reset for next time
-    st.session_state["discuss"] = True
-    st.rerun()
+    with col1:
+        if not st.session_state["recording"] and st.button("Start Recording"):
+            st.session_state["voice_interface"].start_recording()
+            st.session_state["recording"] = True
+            st.rerun()
+
+    with col2:
+        if st.session_state["recording"] and st.button("Stop Recording"):
+            audio_buffer = st.session_state["voice_interface"].stop_recording()
+            transcribed_text = st.session_state["voice_interface"].speech_to_text(audio_buffer)
+            st.session_state["recording"] = False
+            
+            if transcribed_text and transcribed_text != "quit":
+                discussion(transcribed_text)
+                st.rerun()
+
 
 if "eval_clicked" not in st.session_state:
     st.session_state["eval_clicked"] = False
@@ -239,3 +248,14 @@ if st.session_state["eval_clicked"]:
         st.session_state["discuss"] = True
         st.rerun()
 
+# Reset
+if "reset" not in st.session_state:
+    st.session_state["reset"] = False
+
+if st.button("Reset"):
+    st.session_state["reset"] = True
+
+if st.session_state["reset"]:
+    st.session_state["reset"] = False
+    for key in list(st.session_state.keys()):
+        del st.session_state[key]
