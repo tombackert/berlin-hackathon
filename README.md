@@ -51,6 +51,8 @@ graph LR
 - OpenAI API for LLM
 - ElevenLabs API for TextToSpeech and SpeechToText
 - Streamlit for GUI
+- Sounddevice Library
+- Soundfile Library
 
 ### Installations
 
@@ -77,4 +79,13 @@ python3.11 -m pip install sounddevice
 #### Install soundfile lib
 ```zsh
 python3.11 -m pip install soundfile
+```
+
+---
+
+## 🏃🏼 How to Run
+
+Change to the project directory and run the following command:
+```zsh
+streamlit run kidCoderAI.py
 ```

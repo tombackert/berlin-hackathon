@@ -39,7 +39,7 @@ def extractExercise(exerciseString : str):
     global exercise
     data = exerciseString.split("|")
     exercise = {}
-    exercise["Description"] = data[0]
+    exercise["Description"] = data[0].replace("\'", "").replace("\"", "").replace("`", "")
     exercise["Solution"] = data[1]
     for i in range(2, 7):
         exercise[f"Test{i-2}"] = {}
