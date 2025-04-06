@@ -1,4 +1,4 @@
-# TutorAgent 🤖🎓
+# KidCoderAI 🤖🎓
 
 **Voice-First AI Tutor for Elementary Computer Science Education**  
 *Empowering young minds to learn coding fundamentals through natural conversation*
