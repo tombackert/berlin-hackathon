@@ -85,7 +85,17 @@ python3.11 -m pip install soundfile
 
 ## 🏃🏼 How to Run
 
+### Set up enviroment variables
+Create a .env-File and insert the following API-Keys:
+
+```env
+ELEVENLABS_API_KEY=your_api_key_goes_here
+OPENAI_API_KEY=your_api_key_goes_here
+```
+
+### Run the project
 Change to the project directory and run the following command:
+
 ```zsh
 streamlit run kidCoderAI.py
 ```
