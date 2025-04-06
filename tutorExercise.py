@@ -158,4 +158,5 @@ def exerciseRoutine():
                     currentState = 0
     print("\n\n\n***EXERCISE FINISHED***")
 
-exerciseRoutine()
+if __name__ == "main":
+    exerciseRoutine()
